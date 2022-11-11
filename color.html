@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Color</title>
+    <style>
+      #sitio {
+        padding: 5rem;
+        font-size: 5rem;
+        margin-left: 15rem;
+      }
+    </style>
+  </head>
+  <body>
+    <input data-jscolor="{onInput: 'update(this)'}" value="#3399FF">
+    <div id="sitio">
+      Mi sitio web
+    </div>
+    <script src="jscolor.js"></script>
+    <script src="https://unpkg.com/brain.js"></script>
+    <script>
+      var network = new brain.NeuralNetwork();
+
+      network.train([
+        { input: {rojo: 0, verde: 0, azul: 0}, output: {color: 1}},
+        { input: {rojo: 1, verde: 1, azul: 1}, output: {color: 0}},
+        { input: {rojo: 0, verde: 1, azul: 0}, output: {color: 0}},
+        { input: {rojo: 0, verde: .43, azul: 1}, output: {color: 1}},
+        { input: {rojo: 1, verde: 0, azul: 0}, output: {color: 1}},
+      ]);
+
+      function update(color) {        
+        let input = color.toRGBString(), colors = [];
+        input = input.replace('rgb(', '');
+        input = input.replace(')', '');
+        input = input.split(',');
+        for (const c of input) {
+          colors.push(Number.parseInt(c));
+        }
+        
+        var entrada = {
+          rojo : colors[0] / 255,
+          verde: colors[1] / 255,
+          azul : colors[2] / 255
+        };
+
+        var resultado = network.run(entrada);
+        console.log(resultado);
+
+        var div = document.getElementById('sitio');
+        div.style.background = color.toRGBString();
+
+        if (resultado.color > .5)
+        {
+          div.style.color = 'white';
+        } else {
+          div.style.color = 'black';
+        }
+      }
+
+    </script>
+  </body>
+</html>
